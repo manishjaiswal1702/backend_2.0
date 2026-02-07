@@ -7,7 +7,6 @@ const crypto = require("crypto")
 /**
  * /api/auth/register
  */
-
 authRouter.post("/register", async (req, res) => {
     const { email, name, password } = req.body
 
@@ -43,7 +42,6 @@ authRouter.post("/register", async (req, res) => {
 }
 
 )
-
 
 /**
  * POST /api/auth/login
