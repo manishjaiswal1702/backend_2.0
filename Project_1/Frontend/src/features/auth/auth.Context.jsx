@@ -2,7 +2,6 @@ import { createContext, useState, useEffect } from "react";
 import { login, register, getMe } from "./services/auth.api";
 
 
-
 export const AuthContext = createContext()
 
 
