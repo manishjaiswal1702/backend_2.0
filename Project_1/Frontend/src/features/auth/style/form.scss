@@ -15,22 +15,22 @@ main {
 
     .form-container {
         @include flex-column(1rem);
-        
+
         min-width: 350px;
     }
-    
+
     form {
         @include flex-column(1rem);
 
 
-        input{
+        input {
             border: none;
             outline: none;
             padding-inline: 1rem;
             padding-block: 0.5rem;
             border-radius: 1rem;
         }
-        
+
     }
 
 }
