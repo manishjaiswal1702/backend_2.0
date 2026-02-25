@@ -1,14 +1,17 @@
 const express = require('express');
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
+const morgan = require("morgan")
 
-/* create server */
-const app = express()
-app.use(express.json())
+
+const app = express();
+app.use(express.json());
 app.use(cookieParser())
+app.use(morgan("dev"))
 app.use(cors({
+    credentials: true,
     origin: "http://localhost:5173",
-    credentials: true
+    methods: [ "GET", "POST", "PUT", "DELETE" ],
 }))
 
 /* require routes */

@@ -13,13 +13,14 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, "Password is required"]
+        required: [true, "Password is required"],
+        select: false
     },
     bio: String,
     profileImage: {
         type: String,
         default: "https://ik.imagekit.io/hnoglyswo0/avatar-gender-neutral-silhouette-vector-600nw-2470054311.webp"
-    }
+    },
 })
 
 const userModel = mongoose.model("users", userSchema)
