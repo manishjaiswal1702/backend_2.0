@@ -16,8 +16,6 @@ const Feed = () => {
         return (<main><h1>Feed is loading...</h1></main>)
     }
 
-    console.log(feed)
-
 
     return (
         <main className='feed-page' >
