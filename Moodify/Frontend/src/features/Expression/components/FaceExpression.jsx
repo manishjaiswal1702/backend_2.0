@@ -40,7 +40,7 @@ export default function FaceExpression({ onClick = () => { } }) {
                 playsInline
             />
             <h2>{expression}</h2>
-            <button onClick={handleClick} >Detect expression</button>
+            <button onClick={handleClick} className="button" style={{ marginTop: "1rem" }} >Detect expression</button>
         </div>
     );
 }
