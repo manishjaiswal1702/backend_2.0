@@ -12,11 +12,14 @@ const chatSlice = createSlice({
     reducers: {
         createNewChat: (state, action) => {
             const { chatId, title } = action.payload
-            state.chats[chatId] = {
-                id: chatId,
-                title,
-                messages: [],
-                lastUpdated: new Date().toISOString(),
+
+            if (!state.chats[chatId]) {
+                state.chats[chatId] = {
+                    id: chatId,
+                    title,
+                    messages: [],
+                    lastUpdated: new Date().toISOString(),
+                }
             }
         },
         addNewMessage: (state, action) => {
@@ -25,7 +28,7 @@ const chatSlice = createSlice({
         },
         addMessages: (state, action) => {
             const { chatId, messages } = action.payload
-            state.chats[chatId].messages.push(...messages)
+            state.chats[chatId].messages = messages
         },
         setChats: (state, action) => {
             state.chats = action.payload
