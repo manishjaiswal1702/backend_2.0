@@ -1,5 +1,5 @@
 import { generateResponse, generateChatTitle } from "../services/ai.service.js";
-import chatModel from "../models/chat.model.js";
+import chatModel from "../models/chat.model.js"
 import messageModel from "../models/message.model.js";
 
 export async function sendMessage(req, res) {
@@ -17,25 +17,18 @@ export async function sendMessage(req, res) {
         })
     }
 
-    const currentChatId = chatId || chat._id;
-
     const userMessage = await messageModel.create({
-        chat: currentChatId,
+        chat: chatId || chat._id,
         content: message,
         role: "user"
     })
 
-    const messages = await messageModel.find({ chat: currentChatId })
+    const messages = await messageModel.find({ chat: chatId || chat._id })
 
-    const formattedMessages = messages.map(msg => ({
-        role: msg.role === "ai" ? "assistant" : msg.role,
-        content: msg.content
-    }));
-
-    const result = await generateResponse(formattedMessages);
+    const result = await generateResponse(messages);
 
     const aiMessage = await messageModel.create({
-        chat: currentChatId,
+        chat: chatId || chat._id,
         content: result,
         role: "ai"
     })
