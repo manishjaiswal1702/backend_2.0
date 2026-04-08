@@ -503,7 +503,7 @@ Future features and improvements:
 
 ---
 
-**Made with ❤️ by the AI Battle Arena Team**
+**Made with ❤️ by Manish kumar jaiswal**
 
 **Last Updated**: April 2026
 **Version**: 1.0.0
