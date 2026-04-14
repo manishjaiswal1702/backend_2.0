@@ -13,7 +13,6 @@ function validateRequest(req, res, next) {
 }
 
 
-
 export const validateRegisterUser = [
     body("email")
         .isEmail().withMessage("Invalid email format"),
