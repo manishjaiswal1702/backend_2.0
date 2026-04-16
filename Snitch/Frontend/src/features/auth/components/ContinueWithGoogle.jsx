@@ -3,7 +3,8 @@ import React from 'react'
 const ContinueWithGoogle = () => {
     return (
         <a href="/api/auth/google"
-            className="flex items-center justify-center w-full bg-white border border-[#dadce0] rounded px-4 py-3 text-sm font-medium text-[#3c4043] hover:bg-[#f8f9fa] hover:shadow-[0_1px_2px_0_rgba(60,64,67,0.3),0_1px_3px_1px_rgba(60,64,67,0.15)] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#4285F4] focus:ring-offset-2 focus:ring-offset-[#131313]"
+            className="flex items-center justify-center w-full bg-transparent border border-[#E8E2D9] px-4 py-3 text-sm font-medium text-[#7A6E63] hover:border-[#C9A96E] hover:text-[#1b1c1a] transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-[#C9A96E] focus:ring-offset-2 focus:ring-offset-[#fbf9f6]"
+            style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '0.04em' }}
         >
             <svg className="w-5 h-5 mr-3" viewBox="0 0 48 48">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>

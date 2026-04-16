@@ -15,7 +15,7 @@ const CreateProduct = () => {
         priceAmount: '',
         priceCurrency: 'INR',
     });
-    const [images, setImages] = useState([]); // [{ file, preview }]
+    const [images, setImages] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const fileInputRef = useRef(null);
@@ -29,10 +29,7 @@ const CreateProduct = () => {
         const remaining = MAX_IMAGES - images.length;
         if (remaining <= 0) return;
         const toAdd = Array.from(files).slice(0, remaining);
-        const newImages = toAdd.map(file => ({
-            file,
-            preview: URL.createObjectURL(file),
-        }));
+        const newImages = toAdd.map(file => ({ file, preview: URL.createObjectURL(file) }));
         setImages(prev => [...prev, ...newImages]);
     };
 
@@ -44,16 +41,10 @@ const CreateProduct = () => {
     const handleDrop = useCallback((e) => {
         e.preventDefault();
         setIsDragging(false);
-        if (e.dataTransfer.files.length) {
-            addFiles(e.dataTransfer.files);
-        }
+        if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
     }, [images]);
 
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
-
+    const handleDragOver = (e) => { e.preventDefault(); setIsDragging(true); };
     const handleDragLeave = () => setIsDragging(false);
 
     const removeImage = (index) => {
@@ -84,216 +75,275 @@ const CreateProduct = () => {
         }
     };
 
+    const inputClass = "w-full bg-transparent outline-none py-4 text-sm transition-colors duration-300 placeholder:text-[#d0c5b5]";
+    const inputStyle = { color: '#1b1c1a', borderBottom: '1px solid #d0c5b5', fontFamily: "'Inter', sans-serif" };
+    const handleFocus = (e) => { e.target.style.borderBottomColor = '#C9A96E'; };
+    const handleBlur = (e) => { e.target.style.borderBottomColor = '#d0c5b5'; };
+
     return (
-        <div className="min-h-screen bg-[#131313] text-[#e5e2e1] font-sans selection:bg-[#FFD700] selection:text-[#131313]">
+        <>
+            {/* Google Fonts */}
+            <link
+                href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap"
+                rel="stylesheet"
+            />
 
-            {/* Page shell — constrained width, centred */}
-            <div className="max-w-6xl mx-auto px-6 lg:px-12">
+            <div
+                className="min-h-screen selection:bg-[#C9A96E]/30"
+                style={{ backgroundColor: '#fbf9f6', fontFamily: "'Inter', sans-serif" }}
+            >
+                <div className="max-w-6xl mx-auto px-8 lg:px-16 xl:px-24">
 
-                {/* Nav Brand */}
-                <div className="pt-8 pb-0">
-                    <span className="text-[#FFD700] text-xs font-bold tracking-[0.25em] uppercase font-[Manrope,sans-serif]">
-                        Snitch.
-                    </span>
-                </div>
+                    {/* ── Top Bar ── */}
+                    <div className="pt-10 pb-0 flex items-center gap-5">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="text-lg transition-colors duration-200 leading-none"
+                            style={{ color: '#B5ADA3' }}
+                            aria-label="Go back"
+                            onMouseEnter={e => e.currentTarget.style.color = '#C9A96E'}
+                            onMouseLeave={e => e.currentTarget.style.color = '#B5ADA3'}
+                        >
+                            ←
+                        </button>
+                        <span
+                            className="text-xs font-medium tracking-[0.32em] uppercase"
+                            style={{ fontFamily: "'Cormorant Garamond', serif", color: '#C9A96E' }}
+                        >
+                            Snitch.
+                        </span>
+                    </div>
 
-                {/* Header */}
-                <div className="pt-6 pb-2 flex items-center gap-4">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="text-[#d0c6ab] hover:text-[#FFD700] transition-colors duration-200 text-xl leading-none"
-                        aria-label="Go back"
-                    >
-                        ←
-                    </button>
-                    <div>
-                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white font-[Manrope,sans-serif]">
+                    {/* ── Page Header ── */}
+                    <div className="pt-10 pb-0">
+                        <h1
+                            className="text-4xl lg:text-5xl font-light leading-tight"
+                            style={{ fontFamily: "'Cormorant Garamond', serif", color: '#1b1c1a' }}
+                        >
                             New Listing
                         </h1>
-                        <div className="mt-2 h-0.5 w-16 bg-linear-to-r from-[#e9c400] to-[#FFD700]" />
+                        {/* Gold rule separator */}
+                        <div className="mt-4 w-14 h-px" style={{ backgroundColor: '#C9A96E' }} />
                     </div>
-                </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="pt-10 pb-20">
+                    {/* ── Form ── */}
+                    <form onSubmit={handleSubmit} className="pt-14 pb-24">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 lg:items-start">
 
-                    {/* ── Two-column grid on desktop ── */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 lg:items-start">
+                            {/* ── LEFT COLUMN: Text Fields ── */}
+                            <div className="flex flex-col gap-12">
 
-                        {/* ── LEFT COLUMN — text fields ── */}
-                        <div className="flex flex-col gap-10">
-
-                            {/* Product Title */}
-                            <div className="flex flex-col gap-2">
-                                <label
-                                    htmlFor="title"
-                                    className="text-[10px] uppercase tracking-[0.2em] font-semibold text-[#FFD700]/70 font-[Inter,sans-serif]"
-                                >
-                                    Product Title
-                                </label>
-                                <input
-                                    id="title"
-                                    type="text"
-                                    name="title"
-                                    value={formData.title}
-                                    onChange={handleChange}
-                                    required
-                                    placeholder="e.g. Oversized Linen Shirt"
-                                    className="bg-[#1c1b1b] text-white border-b-2 border-[#4d4732] focus:border-[#FFD700] outline-none px-3 py-3 text-base transition-colors duration-300 placeholder:text-[#4d4732] font-[Inter,sans-serif]"
-                                />
-                            </div>
-
-                            {/* Description */}
-                            <div className="flex flex-col gap-2">
-                                <label
-                                    htmlFor="description"
-                                    className="text-[10px] uppercase tracking-[0.2em] font-semibold text-[#FFD700]/70 font-[Inter,sans-serif]"
-                                >
-                                    Description
-                                </label>
-                                <textarea
-                                    id="description"
-                                    name="description"
-                                    value={formData.description}
-                                    onChange={handleChange}
-                                    rows={5}
-                                    placeholder="Describe the product — material, fit, details..."
-                                    className="bg-[#1c1b1b] text-white border-b-2 border-[#4d4732] focus:border-[#FFD700] outline-none px-3 py-3 text-base transition-colors duration-300 placeholder:text-[#4d4732] resize-none leading-relaxed font-[Inter,sans-serif]"
-                                />
-                            </div>
-
-                            {/* Price — Amount + Currency */}
-                            <div className="flex flex-col gap-2">
-                                <label className="text-[10px] uppercase tracking-[0.2em] font-semibold text-[#FFD700]/70 font-[Inter,sans-serif]">
-                                    Price
-                                </label>
-                                <div className="flex gap-4 items-end">
-                                    {/* Amount */}
-                                    <div className="flex flex-col gap-1 flex-2">
-                                        <span className="text-[9px] uppercase tracking-widest text-[#999077] font-[Inter,sans-serif]">Amount</span>
-                                        <input
-                                            id="priceAmount"
-                                            type="number"
-                                            name="priceAmount"
-                                            value={formData.priceAmount}
-                                            onChange={handleChange}
-                                            required
-                                            min="0"
-                                            step="0.01"
-                                            placeholder="0.00"
-                                            className="bg-[#1c1b1b] text-white border-b-2 border-[#4d4732] focus:border-[#FFD700] outline-none px-3 py-3 text-base transition-colors duration-300 placeholder:text-[#4d4732] font-[Inter,sans-serif] w-full"
-                                        />
-                                    </div>
-                                    {/* Currency */}
-                                    <div className="flex flex-col gap-1 flex-1">
-                                        <span className="text-[9px] uppercase tracking-widest text-[#999077] font-[Inter,sans-serif]">Currency</span>
-                                        <select
-                                            id="priceCurrency"
-                                            name="priceCurrency"
-                                            value={formData.priceCurrency}
-                                            onChange={handleChange}
-                                            className="bg-[#1c1b1b] text-white border-b-2 border-[#4d4732] focus:border-[#FFD700] outline-none px-3 py-3 text-base transition-colors duration-300 font-[Inter,sans-serif] w-full cursor-pointer appearance-none"
-                                        >
-                                            {CURRENCIES.map(c => (
-                                                <option key={c} value={c}>{c}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>{/* end LEFT COLUMN */}
-
-                        {/* ── RIGHT COLUMN — images ── */}
-                        <div className="flex flex-col gap-3">
-                            <div className="flex items-center justify-between">
-                                <label className="text-[10px] uppercase tracking-[0.2em] font-semibold text-[#FFD700]/70 font-[Inter,sans-serif]">
-                                    Images
-                                </label>
-                                <span className="text-[10px] text-[#999077] font-[Inter,sans-serif]">
-                                    {images.length}/{MAX_IMAGES}
-                                </span>
-                            </div>
-
-                            {/* Drop Zone */}
-                            {images.length < MAX_IMAGES && (
-                                <div
-                                    onDrop={handleDrop}
-                                    onDragOver={handleDragOver}
-                                    onDragLeave={handleDragLeave}
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className={`
-                                    border-2 border-dashed rounded-sm px-6 py-12 lg:py-16 flex flex-col items-center gap-3 cursor-pointer transition-all duration-300
-                                    ${isDragging
-                                            ? 'border-[#FFD700] bg-[#FFD700]/5'
-                                            : 'border-[#4d4732] hover:border-[#999077] hover:bg-[#1c1b1b]'
-                                        }
-                                `}
-                                >
-                                    <span className="text-3xl text-[#999077]">↑</span>
-                                    <p className="text-sm text-[#d0c6ab] text-center leading-relaxed font-[Inter,sans-serif]">
-                                        Drop images here or{' '}
-                                        <span className="text-[#FFD700] underline underline-offset-2">tap to upload</span>
-                                    </p>
-                                    <p className="text-[10px] text-[#4d4732] uppercase tracking-wider font-[Inter,sans-serif]">
-                                        Up to {MAX_IMAGES} images
-                                    </p>
+                                {/* Product Title */}
+                                <div className="flex flex-col gap-2">
+                                    <label
+                                        htmlFor="cp-title"
+                                        className="text-[10px] uppercase tracking-[0.2em] font-medium"
+                                        style={{ color: '#7A6E63' }}
+                                    >
+                                        Product Title
+                                    </label>
                                     <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        accept="image/*"
-                                        multiple
-                                        onChange={handleFileChange}
-                                        className="hidden"
+                                        id="cp-title"
+                                        type="text"
+                                        name="title"
+                                        value={formData.title}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="e.g. Oversized Linen Shirt"
+                                        className={inputClass}
+                                        style={inputStyle}
+                                        onFocus={handleFocus}
+                                        onBlur={handleBlur}
                                     />
                                 </div>
-                            )}
 
-                            {/* Image Previews — 2-col grid on desktop, horizontal scroll on mobile */}
-                            {images.length > 0 && (
-                                <div className="grid grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-2 mt-1">
-                                    {images.map((img, index) => (
-                                        <div
-                                            key={index}
-                                            className="relative aspect-square rounded-sm overflow-hidden bg-[#201f1f] group"
-                                        >
-                                            <img
-                                                src={img.preview}
-                                                alt={`Preview ${index + 1}`}
-                                                className="w-full h-full object-cover"
-                                            />
-                                            {/* Remove overlay */}
-                                            <button
-                                                type="button"
-                                                onClick={() => removeImage(index)}
-                                                className="absolute inset-0 flex items-center justify-center bg-[#131313]/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-white text-xs font-bold"
-                                                aria-label={`Remove image ${index + 1}`}
-                                            >
-                                                ✕
-                                            </button>
-                                        </div>
-                                    ))}
+                                {/* Description */}
+                                <div className="flex flex-col gap-2">
+                                    <label
+                                        htmlFor="cp-description"
+                                        className="text-[10px] uppercase tracking-[0.2em] font-medium"
+                                        style={{ color: '#7A6E63' }}
+                                    >
+                                        Description
+                                    </label>
+                                    <textarea
+                                        id="cp-description"
+                                        name="description"
+                                        value={formData.description}
+                                        onChange={handleChange}
+                                        rows={5}
+                                        placeholder="Describe the product — material, fit, details..."
+                                        className="w-full bg-transparent outline-none py-4 text-sm transition-colors duration-300 resize-none leading-relaxed placeholder:text-[#d0c5b5]"
+                                        style={inputStyle}
+                                        onFocus={handleFocus}
+                                        onBlur={handleBlur}
+                                    />
                                 </div>
-                            )}
 
-                        </div>{/* end RIGHT COLUMN */}
+                                {/* Price */}
+                                <div className="flex flex-col gap-3">
+                                    <label className="text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: '#7A6E63' }}>
+                                        Price
+                                    </label>
+                                    <div className="flex gap-5 items-end">
+                                        {/* Amount */}
+                                        <div className="flex flex-col gap-1 flex-[3]">
+                                            <span className="text-[9px] uppercase tracking-[0.18em]" style={{ color: '#B5ADA3' }}>Amount</span>
+                                            <input
+                                                id="cp-priceAmount"
+                                                type="number"
+                                                name="priceAmount"
+                                                value={formData.priceAmount}
+                                                onChange={handleChange}
+                                                required
+                                                min="0"
+                                                step="0.01"
+                                                placeholder="0.00"
+                                                className={inputClass}
+                                                style={inputStyle}
+                                                onFocus={handleFocus}
+                                                onBlur={handleBlur}
+                                            />
+                                        </div>
+                                        {/* Currency */}
+                                        <div className="flex flex-col gap-1 flex-[1]">
+                                            <span className="text-[9px] uppercase tracking-[0.18em]" style={{ color: '#B5ADA3' }}>Currency</span>
+                                            <select
+                                                id="cp-priceCurrency"
+                                                name="priceCurrency"
+                                                value={formData.priceCurrency}
+                                                onChange={handleChange}
+                                                className="w-full bg-transparent outline-none py-4 text-sm cursor-pointer appearance-none transition-colors duration-300"
+                                                style={inputStyle}
+                                                onFocus={handleFocus}
+                                                onBlur={handleBlur}
+                                            >
+                                                {CURRENCIES.map(c => (
+                                                    <option key={c} value={c} style={{ backgroundColor: '#fbf9f6', color: '#1b1c1a' }}>{c}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                    </div>{/* end two-column grid */}
+                            {/* ── RIGHT COLUMN: Images ── */}
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: '#7A6E63' }}>
+                                        Images
+                                    </label>
+                                    <span className="text-[10px]" style={{ color: '#B5ADA3' }}>
+                                        {images.length}/{MAX_IMAGES}
+                                    </span>
+                                </div>
 
-                    {/* Submit — full-width below both columns */}
-                    <div className="mt-10 lg:mt-12">
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full bg-linear-to-r from-[#e9c400] to-[#ffd700] text-[#131313] font-bold tracking-wide py-4 px-8 rounded-sm hover:shadow-[0_0_24px_rgba(255,215,0,0.25)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 font-[Inter,sans-serif] text-sm uppercase"
-                        >
-                            {isSubmitting ? 'Publishing...' : 'Publish Listing'}
-                        </button>
-                    </div>
-                </form>
+                                {/* Drop Zone */}
+                                {images.length < MAX_IMAGES && (
+                                    <div
+                                        onDrop={handleDrop}
+                                        onDragOver={handleDragOver}
+                                        onDragLeave={handleDragLeave}
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="border border-dashed px-8 py-14 lg:py-20 flex flex-col items-center gap-4 cursor-pointer transition-all duration-300"
+                                        style={{
+                                            borderColor: isDragging ? '#C9A96E' : '#d0c5b5',
+                                            backgroundColor: isDragging ? 'rgba(201,169,110,0.04)' : 'transparent'
+                                        }}
+                                    >
+                                        {/* Upload icon */}
+                                        <div
+                                            className="w-10 h-10 flex items-center justify-center border transition-colors duration-300"
+                                            style={{ borderColor: isDragging ? '#C9A96E' : '#d0c5b5', color: isDragging ? '#C9A96E' : '#B5ADA3' }}
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                                            </svg>
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-sm leading-relaxed" style={{ color: '#7A6E63' }}>
+                                                Drop images here or{' '}
+                                                <span style={{ color: '#C9A96E', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+                                                    tap to upload
+                                                </span>
+                                            </p>
+                                            <p className="text-[10px] uppercase tracking-[0.15em] mt-2" style={{ color: '#B5ADA3' }}>
+                                                Up to {MAX_IMAGES} images
+                                            </p>
+                                        </div>
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            multiple
+                                            onChange={handleFileChange}
+                                            className="hidden"
+                                        />
+                                    </div>
+                                )}
 
-            </div>{/* end max-w-6xl container */}
-        </div>
+                                {/* Image Previews */}
+                                {images.length > 0 && (
+                                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-2 mt-1">
+                                        {images.map((img, index) => (
+                                            <div
+                                                key={index}
+                                                className="relative aspect-square overflow-hidden group"
+                                                style={{ backgroundColor: '#eae8e5' }}
+                                            >
+                                                <img
+                                                    src={img.preview}
+                                                    alt={`Preview ${index + 1}`}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                                {/* Remove overlay */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(index)}
+                                                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs font-medium tracking-widest uppercase"
+                                                    style={{ backgroundColor: 'rgba(27,24,20,0.55)', color: '#fbf9f6' }}
+                                                    aria-label={`Remove image ${index + 1}`}
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* ── Submit Button ── */}
+                        <div className="mt-16 lg:mt-20">
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full py-5 text-[11px] uppercase tracking-[0.3em] font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={{
+                                    backgroundColor: isSubmitting ? '#7A6E63' : '#1b1c1a',
+                                    color: '#fbf9f6',
+                                    fontFamily: "'Inter', sans-serif"
+                                }}
+                                onMouseEnter={e => {
+                                    if (!isSubmitting) {
+                                        e.currentTarget.style.backgroundColor = '#C9A96E';
+                                        e.currentTarget.style.color = '#1b1c1a';
+                                    }
+                                }}
+                                onMouseLeave={e => {
+                                    if (!isSubmitting) {
+                                        e.currentTarget.style.backgroundColor = '#1b1c1a';
+                                        e.currentTarget.style.color = '#fbf9f6';
+                                    }
+                                }}
+                            >
+                                {isSubmitting ? 'Publishing...' : 'Publish Listing'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </>
     );
 };
 
