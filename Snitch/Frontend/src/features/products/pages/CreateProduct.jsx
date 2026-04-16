@@ -187,7 +187,7 @@ const CreateProduct = () => {
                                     </label>
                                     <div className="flex gap-5 items-end">
                                         {/* Amount */}
-                                        <div className="flex flex-col gap-1 flex-[3]">
+                                        <div className="flex flex-col gap-1 flex-3">
                                             <span className="text-[9px] uppercase tracking-[0.18em]" style={{ color: '#B5ADA3' }}>Amount</span>
                                             <input
                                                 id="cp-priceAmount"
@@ -206,7 +206,7 @@ const CreateProduct = () => {
                                             />
                                         </div>
                                         {/* Currency */}
-                                        <div className="flex flex-col gap-1 flex-[1]">
+                                        <div className="flex flex-col gap-1 flex-1">
                                             <span className="text-[9px] uppercase tracking-[0.18em]" style={{ color: '#B5ADA3' }}>Currency</span>
                                             <select
                                                 id="cp-priceCurrency"

@@ -224,7 +224,7 @@ const Register = () => {
                                 htmlFor="reg-isSeller"
                                 className="flex items-center gap-4 cursor-pointer group"
                             >
-                                <div className="relative flex-shrink-0">
+                                <div className="relative shrink-0">
                                     <input
                                         id="reg-isSeller"
                                         type="checkbox"
