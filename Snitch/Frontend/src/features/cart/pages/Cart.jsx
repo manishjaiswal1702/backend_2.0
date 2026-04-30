@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useCart } from '../hook/useCart'
 import { Link, useNavigate } from 'react-router'
+import { useRazorpay } from "react-razorpay";
 
 /* ─── Inline styles & tokens matching the "Avenue Montaigne" design system ─── */
 const tokens = {
@@ -21,9 +22,11 @@ const tokens = {
 }
 
 const Cart = () => {
-    const cartItems = useSelector(state => state.cart.items)
-    const { handleGetCart, handleIncrementCartItem } = useCart()
+    const cart = useSelector(state => state.cart)
+    const { handleGetCart, handleIncrementCartItem, handleCreateCartOrder, handleVerifyCartOrder } = useCart()
     const navigate = useNavigate()
+    const { error, isLoading, Razorpay } = useRazorpay();
+    const user = useSelector(state => state.user)
 
     /* Local quantity state — key: cartItem._id, value: number */
     const [quantities, setQuantities] = useState({})
@@ -32,16 +35,6 @@ const Cart = () => {
         handleGetCart()
     }, [])
 
-    /* Sync local qty state when cartItems arrive */
-    useEffect(() => {
-        if (cartItems?.length) {
-            const initial = {}
-            cartItems.forEach(item => {
-                initial[item._id] = item.quantity ?? 1
-            })
-            setQuantities(initial)
-        }
-    }, [cartItems])
 
     const changeQty = (id, delta) => {
         setQuantities(prev => ({
@@ -49,21 +42,10 @@ const Cart = () => {
             [id]: Math.max(1, (prev[id] ?? 1) + delta),
         }))
     }
-
-    /* ─── Derived totals ─── */
-    const subtotal = cartItems?.reduce((sum, item) => {
-        const qty = quantities[item._id] ?? item.quantity ?? 1
-        return sum + (item.price?.amount ?? 0) * qty
-    }, 0) ?? 0
-
-    const freeShippingThreshold = 15000
-    const shippingFree = subtotal >= freeShippingThreshold
-    const totalPieces = cartItems?.length ?? 0
-
     /* ─── Helpers ─── */
     const getVariantDetails = (product, variantId) => {
         if (!product?.variants || !variantId) return null
-        return product.variants.find(v => v._id === variantId) ?? null
+        return product.variants
     }
 
     const getDisplayImage = (product, variant) => {
@@ -75,10 +57,43 @@ const Cart = () => {
     const formatCurrency = (amount, currency = 'INR') =>
         `${currency} ${Number(amount).toLocaleString('en-IN')}`
 
-    console.log(cartItems)
+
+    async function handleCheckout() {
+        const order = await handleCreateCartOrder()
+        console.log(order)
+
+
+        const options = {
+            key: "rzp_test_ShNSkpxt3emQVJ",
+            amount: order.amount, // Amount in paise
+            currency: order.currency,
+            name: "Snitch",
+            description: "Test Transaction",
+            order_id: order.id, // Generate order_id on server
+            handler: async (response) => {
+
+                const isValid = await handleVerifyCartOrder(response)
+
+                if (isValid) {
+                    navigate(`/order-success?order_id=${response?.razorpay_order_id}`)
+                }
+            },
+            prefill: {
+                name: user?.fullname,
+                email: user?.email,
+                contact: user?.contact,
+            },
+            theme: {
+                color: tokens.primary,
+            },
+        };
+
+        const razorpayInstance = new Razorpay(options);
+        razorpayInstance.open();
+    }
 
     /* ─── Empty state ─── */
-    if (!cartItems?.length) {
+    if (!cart?.items?.length) {
         return (
             <>
                 <link
@@ -185,13 +200,13 @@ const Cart = () => {
                                     className="text-[10px] uppercase tracking-[0.24em] font-medium"
                                     style={{ color: tokens.muted }}
                                 >
-                                    {totalPieces} {totalPieces === 1 ? 'piece' : 'pieces'}
+                                    {cart?.items?.length} {cart?.items?.length === 1 ? 'piece' : 'pieces'}
                                 </p>
                             </div>
 
                             {/* ── Cart Item List ── */}
                             <div className="flex flex-col gap-6">
-                                {cartItems.map(item => {
+                                {cart.items.map(item => {
                                     const { product, variant: variantId, price, product: { _id } } = item
                                     const variantDetail = getVariantDetails(product, variantId)
                                     const imageUrl = getDisplayImage(product, variantDetail)
@@ -199,6 +214,8 @@ const Cart = () => {
                                     const qty = quantities[_id] ?? item.quantity ?? 1
                                     const attributes = variantDetail?.attributes ?? {}
                                     const stock = variantDetail?.stock
+                                    const variantPrice = variantDetail?.price
+
 
                                     return (
                                         <div
@@ -281,6 +298,16 @@ const Cart = () => {
                                                             {stock > 0 ? `${stock} in stock` : 'Out of stock'}
                                                         </p>
                                                     )}
+                                                    {
+                                                        displayPrice.amount !== variantPrice.amount && (
+                                                            <>
+                                                                {displayPrice.amount > variantPrice.amount
+                                                                    ? <p className="text-[10px] uppercase tracking-[0.15em] mb-4 text-green-800 font-bold" > you will get this at {formatCurrency(variantPrice.amount, variantPrice.currency)} save {Math.abs(variantPrice.amount - displayPrice.amount)}.  </p>
+                                                                    : <p className="text-[10px] uppercase tracking-[0.15em] mb-4 text-red-600 font-bold" > Warning this product will cost you {Math.abs(variantPrice.amount - displayPrice.amount)} more.  </p>
+                                                                }
+                                                            </>
+                                                        )
+                                                    }
                                                 </div>
 
                                                 {/* Bottom Row: Quantity + Remove */}
@@ -387,7 +414,7 @@ const Cart = () => {
                                             className="text-[11px] uppercase tracking-[0.12em] font-medium"
                                             style={{ color: tokens.onSurface }}
                                         >
-                                            {formatCurrency(subtotal)}
+                                            {formatCurrency(cart.totalPrice)}
                                         </span>
                                     </div>
 
@@ -400,9 +427,9 @@ const Cart = () => {
                                         </span>
                                         <span
                                             className="text-[10px] uppercase tracking-widest"
-                                            style={{ color: shippingFree ? '#5a7a5a' : tokens.muted }}
+                                            style={{ color: cart.totalPrice >= 15000 ? '#5a7a5a' : tokens.muted }}
                                         >
-                                            {shippingFree ? 'Complimentary' : `Complimentary over INR 15,000`}
+                                            {cart.totalPrice >= 15000 ? 'Complimentary' : `Complimentary over INR 15,000`}
                                         </span>
                                     </div>
 
@@ -437,7 +464,7 @@ const Cart = () => {
                                         className="text-base uppercase tracking-[0.18em] font-medium"
                                         style={{ color: tokens.onSurface }}
                                     >
-                                        {formatCurrency(subtotal)}
+                                        {formatCurrency(cart.totalPrice)}
                                     </span>
                                 </div>
 
@@ -457,6 +484,7 @@ const Cart = () => {
                                         e.currentTarget.style.backgroundColor = tokens.onSurface
                                         e.currentTarget.style.color = tokens.surface
                                     }}
+                                    onClick={handleCheckout}
                                 >
                                     Proceed to Checkout
                                 </button>
