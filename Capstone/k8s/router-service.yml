@@ -1,12 +1,14 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: sandbox-service
+  name: router-service
+  labels:
+    app: router
 spec:
   selector:
-    app: sandbox
+    app: router
   type: ClusterIP
   ports:
-    - name: main-sandbox-port
+    - name: http
       port: 80
       targetPort: 3000
