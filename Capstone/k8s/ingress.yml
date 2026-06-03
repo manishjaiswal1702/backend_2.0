@@ -40,23 +40,6 @@ spec:
                 port:
                   number: 80
 
-    - http:
-        paths:
-          - pathType: Prefix
-            path: "/agent"
-            backend:
-              service:
-                name: router-service
-                port:
-                  number: 80
-          - pathType: Prefix
-            path: "/preview"
-            backend:
-              service:
-                name: router-service
-                port:
-                  number: 80
-
     - host: "*.preview.localhost"
       http:
         paths:

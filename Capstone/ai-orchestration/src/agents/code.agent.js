@@ -6,9 +6,7 @@ import { createAgent } from "langchain";
 const model = new ChatMistralAI({
   model: "mistral-large-latest",
   apiKey: process.env.MISTRALAI_API_KEY,
-  temperature: 0.7,
-  timeout: 120000,
-  maxRetries: 5
+  "temperature": 0.7,
 })
 
 const agent = (createAgent({
@@ -159,8 +157,7 @@ FINAL PRINCIPLE
 Build the thing the user would build if they were a senior frontend engineer with taste and one afternoon to spare. Default to doing more, not less. When in doubt, ship something polished and offer to refine.
     `
 })).withConfig({
-  recursionLimit: 100,
-  stepTimeout: 120000
+  recursionLimit: 100
 })
 
 export default agent;

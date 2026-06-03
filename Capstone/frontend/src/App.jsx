@@ -24,9 +24,8 @@ export default function App() {
   const dragStartH = useRef(0)
 
   const handleSandboxCreated = useCallback((data) => {
-    const agentBase = `/agent/${data.sandboxId}`
-    const previewUrl = `/preview/${data.sandboxId}`
-    setSandbox({ sandboxId: data.sandboxId, previewUrl, agentBase })
+    const agentBase = `http://${data.sandboxId}.agent.localhost`
+    setSandbox({ sandboxId: data.sandboxId, previewUrl: data.previewUrl, agentBase })
     setStatus('ready')
   }, [])
 

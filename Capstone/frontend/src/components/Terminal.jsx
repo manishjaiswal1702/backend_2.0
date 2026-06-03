@@ -70,13 +70,13 @@ export default function Terminal({ sandboxId }) {
   const connectSocket = useCallback((term) => {
     if (!sandboxId || !term) return
 
+    const agentHost = `http://${sandboxId}.agent.localhost`
+
     try {
-      const socket = io('/', {
-        path: `/agent/${sandboxId}/socket.io`,
+      const socket = io(agentHost, {
         transports: ['websocket', 'polling'],
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
-        withCredentials: true,
       })
 
       socketRef.current = socket
