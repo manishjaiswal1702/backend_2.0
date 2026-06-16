@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from "passport-google-oauth20"
 import cookies from 'cookie-parser';
+import cors from 'cors';
 
 import authRoutes from './routes/auth.routes.js';
 
@@ -14,18 +15,22 @@ const app = express();
 app.use(morgan('dev'));
 app.use(cookies());
 app.use(passport.initialize());
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:5173/api/auth/google/callback"
+    callbackURL: "/api/auth/google/callback"
 }, (accessToken, refreshToken, profile, done) => {
     // Here you would typically find or create a user in your database
     // For this example, we'll just return the profile
     return done(null, profile);
 }));
 
-
+app.set('trust proxy', 1);
 app.get("/_status/healthz", (req, res) => {
     res.status(200).json({ status: 'ok' });
 });
