@@ -20,13 +20,6 @@ router.get('/google/callback', passport.authenticate('google', {
         const { id, displayName, emails, photos } = req.user;
         let user = await User.findOne({ googleId: id });
 
-        await sendAuthNotification({
-            userId: user._id,
-            action: 'google_login',
-            timestamp: new Date(),
-            email: emails[0].value
-        })
-
         if (!user) {
             user = new User({
                 googleId: id,
@@ -34,14 +27,35 @@ router.get('/google/callback', passport.authenticate('google', {
                 name: displayName,
                 avatar: photos[0].value
             });
+
             await user.save();
         }
+
+        await sendAuthNotification({
+            userId: user._id,
+            action: 'google_login',
+            timestamp: new Date(),
+            email: emails[0].value
+        });
 
         // Generate JWT token
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         // Set token in cookie
-        res.cookie('token', token);
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 60 * 60 * 1000
+        });
+
+        console.log("Token cookie set");
+
+        console.log("Host:", req.headers.host);
+        console.log("Token:", token);
+        console.log("Cookies before redirect:", req.cookies);
+
         res.redirect('http://localhost:5173'); // Redirect to your frontend after successful login
     } catch (err) {
         console.error('Error during Google authentication:', err);

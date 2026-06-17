@@ -8,5 +8,5 @@ export function verifyToken(token) {
     catch (err) {
         console.error('Token verification failed:', err);
         return null;
-    } 
+    }
 }

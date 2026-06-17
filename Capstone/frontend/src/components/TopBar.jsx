@@ -23,10 +23,10 @@ export default function TopBar({ sandboxId, activeTab, onTabChange, status }) {
           <div className="w-6 h-6 rounded flex items-center justify-center"
             style={{ background: 'linear-gradient(135deg, rgba(34,211,238,0.2), rgba(8,145,178,0.1))', border: '1px solid rgba(34,211,238,0.3)' }}>
             <svg width="12" height="12" viewBox="0 0 16 16" fill="#22d3ee">
-              <rect x="1" y="1" width="6" height="6" rx="1"/>
-              <rect x="9" y="1" width="6" height="6" rx="1" opacity="0.5"/>
-              <rect x="1" y="9" width="6" height="6" rx="1" opacity="0.5"/>
-              <rect x="9" y="9" width="6" height="6" rx="1"/>
+              <rect x="1" y="1" width="6" height="6" rx="1" />
+              <rect x="9" y="1" width="6" height="6" rx="1" opacity="0.5" />
+              <rect x="1" y="9" width="6" height="6" rx="1" opacity="0.5" />
+              <rect x="9" y="9" width="6" height="6" rx="1" />
             </svg>
           </div>
           <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>Sandbox IDE</span>

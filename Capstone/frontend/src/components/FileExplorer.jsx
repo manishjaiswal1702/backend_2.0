@@ -112,7 +112,7 @@ export default function FileExplorer({ agentBase, activeFile, onFileSelect, refr
   return (
     <aside className="flex flex-col h-full"
       style={{ width: '220px', minWidth: '220px', background: '#0d1424', borderRight: '1px solid #1e2d45' }}>
-      
+
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 shrink-0"
         style={{ borderBottom: '1px solid #1e2d45' }}>
@@ -125,8 +125,8 @@ export default function FileExplorer({ agentBase, activeFile, onFileSelect, refr
           onMouseLeave={e => e.currentTarget.style.color = '#475569'}
           title="Refresh">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M23 4v6h-6M1 20v-6h6"/>
-            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            <path d="M23 4v6h-6M1 20v-6h6" />
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
           </svg>
         </button>
       </div>
