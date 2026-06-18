@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 
 const projectId = process.env.PROJECT_ID;
-const bucketName = "capstone-bucket-1702";
+const bucketName = "capstone-bucket-1802";
 const localDirectory = '/workspace';
 
 const hasAwsCredentials = Boolean(
