@@ -4,69 +4,96 @@ import { S3Client, PutObjectCommand, ListObjectsV2Command, GetObjectCommand } fr
 import fs from 'fs';
 import path from 'path';
 
-const s3Client = new S3Client({
+const projectId = process.env.PROJECT_ID;
+const bucketName = "capstone-bucket-1702";
+const localDirectory = '/workspace';
+
+const hasAwsCredentials = Boolean(
+    process.env.AWS_REGION &&
+    process.env.AWS_ACCESS_KEY_ID &&
+    process.env.AWS_SECRET_ACCESS_KEY
+);
+
+const s3Client = hasAwsCredentials ? new S3Client({
     region: process.env.AWS_REGION,
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
     }
-});
-
-const projectId = process.env.PROJECT_ID;
-const bucketName = "capstone-bucket-1702";
-const localDirectory = '/workspace';
+}) : null;
 
 async function checkS3ForFiles() {
-    console.log(`Checking S3 for existing files in project: ${projectId}`);
-    const listCommand = new ListObjectsV2Command({
-        Bucket: bucketName,
-        Prefix: `${projectId}/`
-    });
-    const listResponse = await s3Client.send(listCommand);
-    return listResponse.Contents || [];
+    if (!s3Client) {
+        console.log("AWS credentials are not configured; skipping S3 file check.");
+        return [];
+    }
+
+    try {
+        console.log(`Checking S3 for existing files in project: ${projectId}`);
+        const listCommand = new ListObjectsV2Command({
+            Bucket: bucketName,
+            Prefix: `${projectId}/`
+        });
+        const listResponse = await s3Client.send(listCommand);
+        return listResponse.Contents || [];
+    } catch (error) {
+        console.error("Failed to check S3 for files:", error);
+        return [];
+    }
 }
 
 async function downloadFilesFromS3(s3Objects) {
+    if (!s3Client) {
+        return;
+    }
+
+    if (!s3Objects.length) {
+        return;
+    }
+
     console.log("Found existing files in S3. Syncing to local directory...");
     for (const file of s3Objects) {
-        // Skip if it is a directory placeholder
-        if (file.Key.endsWith('/')) continue;
+        try {
+            if (!file.Key || file.Key.endsWith('/')) continue;
 
-        const getCommand = new GetObjectCommand({
-            Bucket: bucketName,
-            Key: file.Key
-        });
-        const getResponse = await s3Client.send(getCommand);
+            const getCommand = new GetObjectCommand({
+                Bucket: bucketName,
+                Key: file.Key
+            });
+            const getResponse = await s3Client.send(getCommand);
 
-        const relativePath = file.Key.replace(`${projectId}/`, '');
-        const localFilePath = path.join(localDirectory, relativePath);
+            const relativePath = file.Key.replace(`${projectId}/`, '');
+            const localFilePath = path.join(localDirectory, relativePath);
+            fs.mkdirSync(path.dirname(localFilePath), { recursive: true });
 
-        // Ensure the local directory structure exists
-        fs.mkdirSync(path.dirname(localFilePath), { recursive: true });
+            const writeStream = fs.createWriteStream(localFilePath);
+            getResponse.Body.pipe(writeStream);
 
-        const writeStream = fs.createWriteStream(localFilePath);
-        getResponse.Body.pipe(writeStream);
+            await new Promise((resolve, reject) => {
+                writeStream.on('finish', resolve);
+                writeStream.on('error', reject);
+            });
 
-        await new Promise((resolve, reject) => {
-            writeStream.on('finish', resolve);
-            writeStream.on('error', reject);
-        });
-
-        console.log(`Downloaded ${file.Key} to ${localFilePath}`);
+            console.log(`Downloaded ${file.Key} to ${localFilePath}`);
+        } catch (error) {
+            console.error(`Failed to download ${file.Key} from S3:`, error);
+        }
     }
 }
 
 async function uploadFileToS3(filePath) {
-    try {
-        const fileContent = fs.readFileSync(filePath);
-        const relativePath = path.relative(localDirectory, filePath);
+    if (!s3Client) {
+        console.log(`Skipping S3 upload for ${filePath} because AWS is not configured.`);
+        return;
+    }
 
+    try {
         if (filePath.includes('node_modules') || filePath.includes('.env')) {
             return; // Skip syncing node_modules and .env files
         }
 
-        console.log(filePath)
-        // Files will have the prefix of projectId
+        const fileContent = fs.readFileSync(filePath);
+        const relativePath = path.relative(localDirectory, filePath);
         const s3Key = `${projectId}/${relativePath}`;
 
         const command = new PutObjectCommand({
@@ -77,8 +104,8 @@ async function uploadFileToS3(filePath) {
 
         await s3Client.send(command);
         console.log(`Successfully synced ${filePath} to s3://${bucketName}/${s3Key}`);
-    } catch (err) {
-        console.error(`Error syncing ${filePath} to S3:`, err);
+    } catch (error) {
+        console.error(`Error syncing ${filePath} to S3:`, error);
     }
 }
 
@@ -91,11 +118,11 @@ function startWatcher(hasFiles) {
             /\.env/          // ignore .env files
         ],
         persistent: true,
-        ignoreInitial: hasFiles // if S3 is empty (hasFiles is false), upload all existing local files
+        ignoreInitial: hasFiles
     }).on('all', async (event, filePath) => {
         if (event === 'add' || event === 'change') {
             if (filePath.includes('node_modules') || filePath.includes('.env')) {
-                return; // Skip syncing node_modules and .env files
+                return;
             }
             await uploadFileToS3(filePath);
         }
@@ -107,16 +134,26 @@ async function init() {
         const s3Objects = await checkS3ForFiles();
         const hasFiles = s3Objects.length > 0;
 
-        if (hasFiles) {
+        if (hasFiles && s3Client) {
             await downloadFilesFromS3(s3Objects);
+        } else if (!s3Client) {
+            console.log("S3 is disabled. Running in local development mode.");
         } else {
             console.log("No files found in S3. Local files will be synced to S3 automatically.");
         }
-
-        startWatcher(hasFiles);
     } catch (error) {
-        console.error("Error during initialization:", error);
+        console.error("Error during S3 initialization:", error);
+    } finally {
+        startWatcher(false);
     }
 }
+
+process.on('uncaughtException', (error) => {
+    console.error('Unhandled exception in sync-agent:', error);
+});
+
+process.on('unhandledRejection', (reason) => {
+    console.error('Unhandled promise rejection in sync-agent:', reason);
+});
 
 init();
