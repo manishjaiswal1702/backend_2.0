@@ -17,31 +17,31 @@ export default function Terminal({ sandboxId }) {
 
     const term = new XTerm({
       theme: {
-        background: '#070b14',
-        foreground: '#e2e8f0',
-        cursor: '#22d3ee',
-        cursorAccent: '#070b14',
-        selectionBackground: 'rgba(34,211,238,0.2)',
-        black: '#1e2d45',
-        red: '#ef4444',
-        green: '#10b981',
-        yellow: '#f59e0b',
-        blue: '#3b82f6',
-        magenta: '#a78bfa',
-        cyan: '#22d3ee',
-        white: '#e2e8f0',
-        brightBlack: '#334155',
-        brightRed: '#f87171',
-        brightGreen: '#34d399',
-        brightYellow: '#fbbf24',
-        brightBlue: '#60a5fa',
-        brightMagenta: '#c4b5fd',
-        brightCyan: '#67e8f9',
-        brightWhite: '#f8fafc',
+        background: 'var(--bg-base)',
+        foreground: 'var(--text-primary)',
+        cursor: 'var(--accent-light)',
+        cursorAccent: 'var(--bg-base)',
+        selectionBackground: 'var(--accent-glow-bright)',
+        black: '#2d2d4d',
+        red: 'var(--error)',
+        green: 'var(--success-light)',
+        yellow: 'var(--warning-light)',
+        blue: '#60a5fa',
+        magenta: 'var(--secondary)',
+        cyan: 'var(--accent-light)',
+        white: 'var(--text-secondary)',
+        brightBlack: '#4d4d6d',
+        brightRed: 'var(--error-light)',
+        brightGreen: 'var(--success-light)',
+        brightYellow: 'var(--warning-light)',
+        brightBlue: '#93c5fd',
+        brightMagenta: 'var(--secondary-light)',
+        brightCyan: 'var(--accent-light)',
+        brightWhite: 'var(--text-primary)',
       },
       fontFamily: '"JetBrains Mono", "Fira Code", "Cascadia Code", monospace',
       fontSize: 13,
-      lineHeight: 1.5,
+      lineHeight: 1.6,
       cursorBlink: true,
       cursorStyle: 'bar',
       scrollback: 5000,
@@ -134,34 +134,49 @@ export default function Terminal({ sandboxId }) {
   }, [])
 
   return (
-    <div className="flex flex-col h-full"
-      style={{ background: '#070b14' }}>
+    <div className="flex flex-col h-full transition-smooth"
+      style={{ background: 'var(--bg-base)' }}>
 
       {/* Terminal toolbar */}
-      <div className="flex items-center justify-between px-3 shrink-0"
-        style={{ height: '32px', background: '#0d1424', borderBottom: '1px solid #1e2d45' }}>
+      <div className="flex items-center justify-between px-4 shrink-0 transition-smooth"
+        style={{
+          height: '40px',
+          background: 'linear-gradient(135deg, var(--bg-panel) 0%, rgba(26,26,46,0.6) 100%)',
+          borderBottom: '1px solid var(--border)',
+          backdropFilter: 'blur(10px)'
+        }}>
         <div className="flex items-center gap-2">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
-            <polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" />
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-light)" strokeWidth="2.5">
+            <polyline points="4 17 10 11 4 5" />
+            <line x1="12" y1="19" x2="20" y2="19" />
           </svg>
-          <span className="text-xs font-medium" style={{ color: '#475569' }}>Terminal</span>
+          <span className="text-xs font-semibold uppercase tracking-tight" style={{ color: 'var(--text-secondary)' }}>
+            Terminal
+          </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {error && (
-            <span className="text-xs" style={{ color: '#ef4444' }}>{error}</span>
+            <span className="text-xs px-2 py-1 rounded-lg font-medium transition-smooth"
+              style={{ color: 'var(--error)', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+              {error}
+            </span>
           )}
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full"
-              style={{ background: connected ? '#10b981' : '#ef4444', boxShadow: `0 0 6px ${connected ? '#10b981' : '#ef4444'}` }} />
-            <span className="text-xs" style={{ color: '#475569' }}>
-              {connected ? 'Connected' : 'Disconnected'}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-smooth"
+            style={{ background: 'var(--accent-glow)', border: '1px solid var(--accent)' }}>
+            <div className="w-2 h-2 rounded-full animate-pulse"
+              style={{
+                background: connected ? 'var(--success-light)' : 'var(--error)',
+                boxShadow: `0 0 8px ${connected ? 'var(--success-light)' : 'var(--error)'}`
+              }} />
+            <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>
+              {connected ? '✓ Connected' : '✗ Disconnected'}
             </span>
           </div>
         </div>
       </div>
 
       {/* xterm container */}
-      <div ref={containerRef} className="flex-1 overflow-hidden" />
+      <div ref={containerRef} className="flex-1 overflow-hidden transition-smooth" />
     </div>
   )
 }

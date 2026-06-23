@@ -67,9 +67,7 @@ export default function App() {
   const { sandboxId, previewUrl, agentBase } = sandbox
 
   return (
-    <div className="flex flex-col h-full w-full overflow-hidden"
-      style={{ background: '#070b14' }}>
-
+    <div className="flex flex-col h-full w-full overflow-hidden" style={{ background: 'var(--bg-base)' }}>
       {/* Top bar */}
       <TopBar
         sandboxId={sandboxId}
@@ -79,8 +77,7 @@ export default function App() {
       />
 
       {/* Main layout */}
-      <div className="flex flex-1 overflow-hidden">
-
+      <div className="flex flex-1 overflow-hidden gap-1 p-1" style={{ background: 'var(--bg-surface)' }}>
         {/* File Explorer sidebar */}
         <FileExplorer
           agentBase={agentBase}
@@ -90,10 +87,9 @@ export default function App() {
         />
 
         {/* Center — main content + terminal */}
-        <div className="flex flex-col flex-1 overflow-hidden">
-
+        <div className="flex flex-col flex-1 overflow-hidden gap-1 rounded-lg" style={{ background: 'var(--bg-panel)', overflow: 'hidden' }}>
           {/* Main content area */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden rounded-lg" style={{ background: 'var(--bg-base)' }}>
             {activeTab === 'preview' ? (
               <PreviewFrame previewUrl={previewUrl} />
             ) : (
@@ -103,21 +99,26 @@ export default function App() {
 
           {/* Drag handle */}
           <div
-            className="shrink-0 flex items-center justify-center cursor-row-resize select-none"
-            style={{ height: '6px', background: '#0d1424', borderTop: '1px solid #1e2d45', borderBottom: '1px solid #1e2d45', zIndex: 10 }}
+            className="shrink-0 flex items-center justify-center cursor-row-resize select-none transition-smooth hover-glow"
+            style={{
+              height: '8px',
+              background: 'linear-gradient(90deg, var(--border) 0%, var(--accent-glow) 50%, var(--border) 100%)',
+              borderRadius: '4px',
+              opacity: 0.5,
+              zIndex: 10
+            }}
             onMouseDown={handleDragStart}
-            title="Drag to resize terminal">
-            <div className="w-12 h-0.5 rounded-full" style={{ background: '#2a3f60' }} />
-          </div>
+            title="Drag to resize terminal"
+          />
 
           {/* Terminal */}
-          <div className="shrink-0 overflow-hidden" style={{ height: `${terminalHeight}px` }}>
+          <div className="shrink-0 overflow-hidden rounded-lg" style={{ height: `${terminalHeight}px`, background: 'var(--bg-base)' }}>
             <Terminal sandboxId={sandboxId} />
           </div>
         </div>
 
         {/* Right — AI Chat */}
-        <div className="shrink-0 overflow-hidden" style={{ width: '340px' }}>
+        <div className="shrink-0 overflow-hidden rounded-lg" style={{ width: '380px', background: 'var(--bg-panel)' }}>
           <AiChat
             sandboxId={sandboxId}
             onFilesChanged={handleFilesChanged}
